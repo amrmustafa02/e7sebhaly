@@ -1,0 +1,18 @@
+{
+  "name": "@ehsebhaly/schemas",
+  "version": "1.0.0",
+  "private": true,
+  "main": "./src/index.ts",
+  "types": "./src/index.ts",
+  "exports": {
+    ".": "./src/index.ts",
+    "./receipt-schema": "./src/receipt-schema.ts"
+  },
+  "scripts": {
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@ehsebhaly/types": "*",
+    "zod": "^3.24.1"
+  }
+}

@@ -1,0 +1,66 @@
+name: CI/CD — Build, Test & Deploy to Server
+
+on:
+  push:
+    branches: [main, master]
+  workflow_dispatch:
+
+jobs:
+  ci:
+    name: Typecheck, Test & Build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Run TypeScript typecheck across workspaces
+        run: npm run typecheck
+
+      - name: Run automated tests (Vitest)
+        run: npm test
+
+      - name: Build production Next.js app
+        run: npm run build
+
+  deploy:
+    name: Deploy to Production Server (129.121.119.46)
+    needs: ci
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master' || github.event_name == 'workflow_dispatch'
+    steps:
+      - name: Setup SSH Key
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_ed25519
+          chmod 600 ~/.ssh/id_ed25519
+          ssh-keyscan -H 129.121.119.46 >> ~/.ssh/known_hosts
+
+      - name: Pull latest from GitHub, build, and reload PM2 on server
+        env:
+          AI_API_KEY: ${{ secrets.AI_API_KEY }}
+          AI_MODEL: ${{ secrets.AI_MODEL || 'gemini-flash-lite-latest' }}
+        run: |
+          ssh amr02@129.121.119.46 << EOF
+            set -e
+            cd ~/apps/ehsebhaly
+            git fetch origin main
+            git reset --hard origin/main
+            cat > apps/web/.env.local << EOT
+          AI_API_KEY=${AI_API_KEY}
+          AI_MODEL=${AI_MODEL}
+          EOT
+            cp apps/web/.env.local .env.local
+            npm install --prefer-offline --no-audit
+            npm run build
+            pm2 startOrReload ecosystem.config.cjs --update-env
+            pm2 save
+          EOF

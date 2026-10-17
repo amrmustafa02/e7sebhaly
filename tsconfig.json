@@ -1,0 +1,21 @@
+{
+  "extends": "./tsconfig.base.json",
+  "compilerOptions": {
+    "baseUrl": ".",
+    "paths": {
+      "@ehsebhaly/types": ["./packages/types/src/index.ts"],
+      "@ehsebhaly/schemas": ["./packages/schemas/src/index.ts"],
+      "@ehsebhaly/calculations": ["./packages/calculations/src/index.ts"],
+      "@ehsebhaly/ai": ["./packages/ai/src/index.ts"],
+      "@/*": ["./apps/web/*", "./*"]
+    }
+  },
+  "include": [
+    "packages/**/*.ts",
+    "apps/web/**/*.ts",
+    "apps/web/**/*.tsx",
+    "lib/**/*.ts",
+    "tests/**/*.ts"
+  ],
+  "exclude": ["node_modules", "**/node_modules", "**/.next"]
+}

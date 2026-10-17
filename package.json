@@ -1,0 +1,33 @@
+{
+  "name": "ehsebhaly-monorepo",
+  "version": "1.0.0",
+  "private": true,
+  "description": "احسبهالي — Monorepo لتطبيق تقسيم فواتير المطاعم بالذكاء الاصطناعي",
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "scripts": {
+    "dev": "npm run dev --workspace=@ehsebhaly/web",
+    "build": "npm run build --workspace=@ehsebhaly/web",
+    "start": "npm run start --workspace=@ehsebhaly/web",
+    "lint": "npm run typecheck",
+    "typecheck": "tsc --noEmit && npm run typecheck --workspaces --if-present",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "deploy": "bash scripts/deploy.sh"
+  },
+  "dependencies": {
+    "next": "^15.1.0",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0",
+    "zod": "^3.24.1"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.2",
+    "@types/react": "^19.0.2",
+    "@types/react-dom": "^19.0.2",
+    "typescript": "^5.7.2",
+    "vitest": "^2.1.8"
+  }
+}
